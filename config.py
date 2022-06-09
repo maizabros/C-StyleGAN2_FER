@@ -1,5 +1,5 @@
 from pathlib import Path
-from torch import device, cuda
+from torch import cuda
 
 GPU_BATCH_SIZE = 8
 GRADIENT_BATCH_SIZE = 64
@@ -36,16 +36,16 @@ STEP_FACTOR = 1000
 SAVE_EVERY = 250
 NUM_TRAIN_STEPS = EVALUATE_EVERY * STEP_FACTOR
 
-NAME = "test_all_2_100k"
+NAME = "test_all_3_100k"
 CURRENT_DIR = Path('.')
-LOG_FILENAME = CURRENT_DIR / 'logs.csv'
+LOG_FILENAME = CURRENT_DIR / NAME / 'logs.csv'
 MODELS_DIR = CURRENT_DIR / 'models'
 RESULTS_DIR = CURRENT_DIR / 'results'
 
-NEW = False
+NEW = True
 LOAD_FROM = -1
 
-DEVICE = device("cuda" if cuda.is_available() else "cpu")
+DEVICE = "cuda" if cuda.is_available() else "cpu"
 GPU = '0'
 EPSILON = 1e-8
 LEARNING_RATE = 2e-4

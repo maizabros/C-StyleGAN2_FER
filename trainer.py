@@ -40,8 +40,7 @@ class Trainer:
                                             drop_last=True, shuffle=False, pin_memory=False))
         self.folder = folder
         self.label_dim = self.dataset.__label_len__()
-        # self.label_dim = len([subfolder for subfolder in os.listdir(folder)
-        #                       if os.path.isdir(os.path.join(folder, subfolder))])
+
         if not self.label_dim:
             self.label_dim = 1
 
