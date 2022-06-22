@@ -3,3 +3,6 @@
 /test/
 /.idea/
 /__pycache__/
+/training_progress_test_all_3_100k/
+/training_progress_test_all_2_100k/
+/training_progress/

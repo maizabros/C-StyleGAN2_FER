@@ -8,11 +8,12 @@ import torchvision
 
 
 root = 'models'
-NAME = "test_all_2_100k"
+NAME = "test_all_3_100k"
 
 IMAGES_TO_GENERATE = 10
 ROWS = 2
 COLS = 5
+
 
 def generate(name=NAME, images_to_generate=IMAGES_TO_GENERATE, use_mapper=True, truncation_trick=1.):
     with open(os.path.join(root, name, 'config.json'), 'r') as file:
@@ -46,6 +47,7 @@ def generate(name=NAME, images_to_generate=IMAGES_TO_GENERATE, use_mapper=True, 
         #     torchvision.utils.save_image(im, f'test\{i}-{j}.png', nrow=model.label_dim)
 
     torchvision.utils.save_image(test_image, f'test.png', nrow=ROWS*COLS)
+
 
 if __name__ == "__main__":
     fire.Fire(generate)

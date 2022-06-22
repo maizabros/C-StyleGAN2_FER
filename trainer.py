@@ -1,4 +1,3 @@
-import os
 from random import random
 from shutil import rmtree
 from pathlib import Path
@@ -10,7 +9,7 @@ import torch.nn.functional as F
 
 import torchvision
 
-from dataset import cycle, Dataset
+from dataset import cycle
 from StyleGAN2 import StyleGAN2
 from misc import gradient_penalty, image_noise, noise_list, mixed_list, latent_to_w, \
     evaluate_in_chunks, styles_def_to_tensor, EMA
@@ -19,7 +18,8 @@ from utils import CSVImageDataset
 from config import RESULTS_DIR, MODELS_DIR, EPSILON, LOG_FILENAME, GPU_BATCH_SIZE, LEARNING_RATE, \
     PATH_LENGTH_REGULIZER_FREQUENCY, HOMOGENEOUS_LATENT_SPACE, USE_DIVERSITY_LOSS, SAVE_EVERY, EVALUATE_EVERY, \
     CHANNELS, CONDITION_ON_MAPPER, MIXED_PROBABILITY, GRADIENT_ACCUMULATE_EVERY, MOVING_AVERAGE_START, \
-    MOVING_AVERAGE_PERIOD, USE_BIASES, LABEL_EPSILON, LATENT_DIM, NETWORK_CAPACITY, IGNORE_TAGS, CSV_PATH
+    MOVING_AVERAGE_PERIOD, USE_BIASES, LABEL_EPSILON, LATENT_DIM, NETWORK_CAPACITY, CSV_PATH, \
+    IGNORE_TAGS, TAGS
 
 
 class Trainer:
@@ -29,13 +29,13 @@ class Trainer:
                  save_every=SAVE_EVERY, evaluate_every=EVALUATE_EVERY, condition_on_mapper=CONDITION_ON_MAPPER,
                  gradient_accumulate_every=GRADIENT_ACCUMULATE_EVERY, moving_average_start=MOVING_AVERAGE_START,
                  moving_average_period=MOVING_AVERAGE_PERIOD, use_biases=USE_BIASES, label_epsilon=LABEL_EPSILON,
-                 latent_dim=LATENT_DIM, network_capacity=NETWORK_CAPACITY,
+                 latent_dim=LATENT_DIM, network_capacity=NETWORK_CAPACITY, tags=TAGS, ignore_tags=IGNORE_TAGS,
                  *args, **kwargs):
         torch.cuda.empty_cache()
         self.condition_on_mapper = condition_on_mapper
-        # self.dataset = Dataset(folder, image_size)
-        self.dataset = CSVImageDataset(csv_file_path=CSV_PATH, image_size=image_size, root=folder,
-                                       ignore_tags=IGNORE_TAGS)
+
+        self.dataset = CSVImageDataset(csv_file_path=CSV_PATH, image_size=image_size, root=folder, tags=tags,
+                                       ignore_tags=ignore_tags)
         self.loader = cycle(data.DataLoader(self.dataset, num_workers=0, batch_size=batch_size,
                                             drop_last=True, shuffle=False, pin_memory=False))
         self.folder = folder
@@ -304,7 +304,7 @@ class Trainer:
 
     def print_log(self, batch_id):
         if batch_id == 0:
-            with open(LOG_FILENAME, 'w') as file:
+            with open(LOG_FILENAME, 'w+') as file:
                 file.write('G;D;GP;PL\n')
         else:
             with open(LOG_FILENAME, 'a') as file:

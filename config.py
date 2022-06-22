@@ -15,9 +15,11 @@ IMAGE_SIZE = 128
 LATENT_DIM = 512
 USE_BIASES = False
 
+
 EXTS = ['jpg', 'png']
 FOLDER = "D:\\GANs\\Datasets\\Various\\affectnet_src.tar\\affectnet_src\\affectnet"
 CSV_PATH = FOLDER + "\\affectnet_complete.csv"
+TAGS = ["label", "age", "gender", "race", "race4"]
 IGNORE_TAGS = ["partition", "subject", "sequence", "cropped_img", "age_conf_fair", "age_scores_fair",
                "gender_conf_fair", "gender_scores_fair", "race_conf_fair", "race_scores_fair", "race_conf_fair_4",
                "race_scores_fair_4"]
@@ -32,17 +34,17 @@ MOVING_AVERAGE_PERIOD = 200
 
 
 EVALUATE_EVERY = 100
-STEP_FACTOR = 1000
+STEP_FACTOR = 2000
 SAVE_EVERY = 250
 NUM_TRAIN_STEPS = EVALUATE_EVERY * STEP_FACTOR
 
-NAME = "test_all_3_100k"
+NAME = "test_all_2_100k"
 CURRENT_DIR = Path('.')
-LOG_FILENAME = CURRENT_DIR / NAME / 'logs.csv'
+LOG_FILENAME = CURRENT_DIR / f'logs_{NAME}.csv'
 MODELS_DIR = CURRENT_DIR / 'models'
 RESULTS_DIR = CURRENT_DIR / 'results'
 
-NEW = True
+NEW = False
 LOAD_FROM = -1
 
 DEVICE = "cuda" if cuda.is_available() else "cpu"
