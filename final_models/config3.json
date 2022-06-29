@@ -1,0 +1,19 @@
+{
+    "batch_size": 8,
+    "channels": 3,
+    "condition_on_mapper": true,
+    "evaluate_every": 100,
+    "folder": "D:\\GANs\\Datasets\\Various\\affectnet_src.tar\\affectnet_src\\affectnet",
+    "gradient_accumulate_every": 8,
+    "homogeneous_latent_space": true,
+    "image_size": 128,
+    "label_epsilon": 0,
+    "latent_dim": 512,
+    "lr": 0.0002,
+    "name": "test_all_3_100k",
+    "network_capacity": 16,
+    "path_length_regulizer_frequency": 2,
+    "save_every": 250,
+    "use_biases": false,
+    "use_diversity_loss": true
+}
