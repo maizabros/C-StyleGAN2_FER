@@ -262,7 +262,7 @@ class Trainer:
             self.labels_to_evaluate = torch.from_numpy(self.labels_to_evaluate).cuda().float()
 
     @torch.no_grad()
-    def evaluate(self, use_mapper=True, truncation_trick=1):
+    def evaluate(self, use_mapper=True, truncation_trick=1, only_ema=False):
         self.GAN.eval()
 
         def generate_images(stylizer, generator, latents, noise, labels, truncation_trick=1):
@@ -278,6 +278,12 @@ class Trainer:
             generated_images = self.evaluate_in_chunks(self.batch_size, generator, latents, noise, labels)
             generated_images.clamp_(0., 1.)
             return generated_images
+
+        if only_ema:
+            average_generated_images = generate_images(self.GAN.SE, self.GAN.GE,
+                                                       self.latents_to_evaluate, self.noise_to_evaluate,
+                                                       self.labels_to_evaluate, truncation_trick=truncation_trick)
+            return average_generated_images
 
         generated_images = generate_images(self.GAN.S, self.GAN.G,
                                            self.latents_to_evaluate, self.noise_to_evaluate, self.labels_to_evaluate,
