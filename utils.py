@@ -80,12 +80,12 @@ class GenDataset(Dataset):
 
 
 class RealDataset(Dataset):
-    def __init__(self, csv_file_path, root, image_size, num_samples=10000, dropna=True):
+    def __init__(self, csv_file_path, root, image_size, num_samples=-1, dropna=True):
         super().__init__()
         self.annotations = pd.read_csv(csv_file_path, sep=',')
         if dropna:
             self.annotations = self.annotations.dropna()
-        self.annotations = self.annotations.sample(n=num_samples)
+        self.annotations = self.annotations.sample(n=num_samples) if num_samples > 0 else self.annotations
         self.root = root
         self.transform = transforms.Compose([
             transforms.Resize(image_size),

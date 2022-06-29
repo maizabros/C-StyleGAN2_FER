@@ -14,13 +14,13 @@ from utils import GenDataset, RealDataset
 AVAILABLE_METRICS = ["FID", "PR"]
 
 
-def compute_embeddings(dataloader, count, batch_size, embedding_model, num_features, metric):
+def compute_embeddings(dataloader, count, batch_size, embedding_model, num_features, metric, verbose=False):
     image_embeddings = None
     if metric == "FID":
         image_embeddings = np.zeros((count * batch_size, num_features))
     elif metric == "PR":
         image_embeddings = torch.zeros((count * batch_size, num_features))
-    for i in range(count):
+    for i in tqdm(range(count)) if verbose else range(count):
         images = next(iter(dataloader)).cuda()
         embeddings = embedding_model(images)
         embeddings = embeddings[0].detach().cpu().numpy() if metric == "FID" else embeddings.detach().cpu()
