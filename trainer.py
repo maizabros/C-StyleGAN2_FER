@@ -30,11 +30,12 @@ class Trainer:
                  gradient_accumulate_every=GRADIENT_ACCUMULATE_EVERY, moving_average_start=MOVING_AVERAGE_START,
                  moving_average_period=MOVING_AVERAGE_PERIOD, use_biases=USE_BIASES, label_epsilon=LABEL_EPSILON,
                  latent_dim=LATENT_DIM, network_capacity=NETWORK_CAPACITY, tags=TAGS, ignore_tags=IGNORE_TAGS,
+                 csv_path=CSV_PATH,
                  *args, **kwargs):
         torch.cuda.empty_cache()
         self.condition_on_mapper = condition_on_mapper
 
-        self.dataset = CSVImageDataset(csv_file_path=CSV_PATH, image_size=image_size, root=folder, tags=tags,
+        self.dataset = CSVImageDataset(csv_file_path=csv_path, image_size=image_size, root=folder, tags=tags,
                                        ignore_tags=ignore_tags)
         self.loader = cycle(data.DataLoader(self.dataset, num_workers=0, batch_size=batch_size,
                                             drop_last=True, shuffle=False, pin_memory=False))
