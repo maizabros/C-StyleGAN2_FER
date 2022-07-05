@@ -1,7 +1,7 @@
 from pathlib import Path
 from torch import cuda
 
-GPU_BATCH_SIZE = 2
+GPU_BATCH_SIZE = 8
 GRADIENT_BATCH_SIZE = 64
 PATH_LENGTH_REGULIZER_FREQUENCY = 2
 GRADIENT_ACCUMULATE_EVERY = 4 # unused if using run.py
@@ -14,7 +14,7 @@ STYLE_DEPTH = 8
 IMAGE_SIZE = 256
 LATENT_DIM = 512
 USE_BIASES = False
-
+LIMIT_CLASSES = True
 
 EXTS = ['jpg', 'png']
 FOLDER = "D:\\GANs\\Datasets\\Various\\affectnet_src.tar\\affectnet_src\\affectnet"
@@ -24,7 +24,7 @@ IGNORE_TAGS = ["partition", "subject", "sequence", "cropped_img", "age_conf_fair
                "gender_conf_fair", "gender_scores_fair", "race_conf_fair", "race_scores_fair", "race_conf_fair_4",
                "race_scores_fair_4"]
 
-IMG_LIMIT = 0
+IMG_LIMIT = 0  # Deprecated
 HOMOGENEOUS_LATENT_SPACE = True
 USE_DIVERSITY_LOSS = True
 MIXED_PROBABILITY = 0.9

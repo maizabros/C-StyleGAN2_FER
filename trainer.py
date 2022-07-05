@@ -19,7 +19,7 @@ from config import RESULTS_DIR, MODELS_DIR, EPSILON, LOG_FILENAME, GPU_BATCH_SIZ
     PATH_LENGTH_REGULIZER_FREQUENCY, HOMOGENEOUS_LATENT_SPACE, USE_DIVERSITY_LOSS, SAVE_EVERY, EVALUATE_EVERY, \
     CHANNELS, CONDITION_ON_MAPPER, MIXED_PROBABILITY, GRADIENT_ACCUMULATE_EVERY, MOVING_AVERAGE_START, \
     MOVING_AVERAGE_PERIOD, USE_BIASES, LABEL_EPSILON, LATENT_DIM, NETWORK_CAPACITY, CSV_PATH, \
-    IGNORE_TAGS, TAGS
+    IGNORE_TAGS, TAGS, LIMIT_CLASSES
 
 
 class Trainer:
@@ -36,7 +36,7 @@ class Trainer:
         self.condition_on_mapper = condition_on_mapper
 
         self.dataset = CSVImageDataset(csv_file_path=csv_path, image_size=image_size, root=folder, tags=tags,
-                                       ignore_tags=ignore_tags)
+                                       ignore_tags=ignore_tags, limit_classes=LIMIT_CLASSES)
         self.loader = cycle(data.DataLoader(self.dataset, num_workers=0, batch_size=batch_size,
                                             drop_last=True, shuffle=False, pin_memory=False))
         self.folder = folder
@@ -83,6 +83,9 @@ class Trainer:
 
         self.evaluate_in_chunks = evaluate_in_chunks
         self.styles_def_to_tensor = styles_def_to_tensor
+
+        if use_diversity_loss:
+            self.all_posible_labels = torch.load("all_possible_labels.pt").cuda()
 
     def train(self):
         self.GAN.train()
@@ -143,8 +146,10 @@ class Trainer:
 
         self.GAN.G_opt.zero_grad()
         if self.use_diversity_loss:
-            labels = np.array([np.eye(self.label_dim)[np.random.randint(self.label_dim)]
-                               for _ in range(8 * self.label_dim)])
+            # labels = np.array([np.eye(self.label_dim)[np.random.randint(self.label_dim)]
+            #                    for _ in range(8 * self.label_dim)])
+            size = self.all_posible_labels.shape[0]
+            labels = self.all_posible_labels[torch.randint(size, (8 * self.label_dim,))]
             self.set_evaluation_parameters(labels_to_evaluate=labels, reset=True)
             self.evaluate()
             w = self.last_latents.cpu().data.numpy()

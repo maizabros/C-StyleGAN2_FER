@@ -4,7 +4,7 @@
     "condition_on_mapper": true,
     "evaluate_every": 100,
     "folder": "D:\\GANs\\Datasets\\Various\\affectnet_src.tar\\affectnet_src\\affectnet",
-    "csv_path": "D:\\TFG\\Datasets\\affectnet_complete.csv",
+    "csv_path": "D:\\GANs\\Datasets\\Various\\affectnet_src.tar\\affectnet_src\\affectnet\\affectnet_complete.csv",
     "gradient_accumulate_every": 8,
     "homogeneous_latent_space": true,
     "image_size": 128,

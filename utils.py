@@ -12,13 +12,27 @@ from config import IMG_LIMIT
 
 class CSVImageDataset(Dataset):
 
-    def __init__(self, csv_file_path, root, image_size, tags, ignore_tags=None, one_hot=True, dropna=True):
+    def __init__(self, csv_file_path, root, image_size, tags, ignore_tags=None, one_hot=True, dropna=True,
+                 limit_classes=False):
         super().__init__()
         self.annotations = pd.read_csv(csv_file_path, sep=',')
         if dropna:
             self.annotations = self.annotations.dropna()
-        if IMG_LIMIT > 0:
-            self.annotations = self.annotations.sample(n=IMG_LIMIT)
+
+        if limit_classes: # Bad implementation!! TODO: fix bad implementation and remove this
+            whites = self.annotations[self.annotations.race == "White"].index
+            happy = self.annotations[self.annotations.label == "happy"].index
+            neutral = self.annotations[self.annotations.label == "neutral"].index
+            age_20_29 = self.annotations[self.annotations.age == "20-29"].index
+
+            inter_white_happy = np.intersect1d(whites, happy)
+            inter_white_neutral = np.intersect1d(whites, neutral)
+            inter_white_age_20_29 = np.intersect1d(whites, age_20_29)
+
+            self.annotations = drop_index(self.annotations, inter_white_happy)
+            self.annotations = drop_index(self.annotations, inter_white_neutral)
+            self.annotations = drop_index(self.annotations, inter_white_age_20_29)
+
         if ignore_tags:
             assert sum([ignore_tags[i] not in self.annotations.columns for i in range(len(ignore_tags))]) == 0, \
                 "Error checking tags in Dataframe Keys. Check if all of the tags exists in your CSV file"
@@ -99,3 +113,14 @@ class RealDataset(Dataset):
         image_path = os.path.join(self.root, self.annotations.iloc[index, 1])
         image = Image.open(image_path)
         return self.transform(image)
+
+
+def drop_index(data, index, inplace=False):
+    if np.intersect1d(index, data.index).size == 0:
+        return data
+    ii = np.intersect1d(index, data.index)
+    try:
+        data = data.drop(ii, inplace=inplace)
+    except:
+        print("Some of the indexes are not in the dataframe")
+    return data
