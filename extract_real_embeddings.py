@@ -8,7 +8,7 @@ from metrics import compute_embeddings
 from utils import RealDataset
 
 root = '../models'
-name = "test_all_2_100k"
+name = "test_all_4_100k"
 
 vgg = models.vgg16(pretrained=True)
 vgg.classifier = nn.Sequential(*[vgg.classifier[i] for i in range(5)])

@@ -2,7 +2,7 @@ from pathlib import Path
 from torch import cuda
 
 GPU_BATCH_SIZE = 8
-GRADIENT_BATCH_SIZE = 64
+GRADIENT_BATCH_SIZE = 32
 PATH_LENGTH_REGULIZER_FREQUENCY = 2
 GRADIENT_ACCUMULATE_EVERY = 4 # unused if using run.py
 

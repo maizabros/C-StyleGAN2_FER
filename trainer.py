@@ -268,7 +268,7 @@ class Trainer:
             self.labels_to_evaluate = torch.from_numpy(self.labels_to_evaluate).cuda().float()
 
     @torch.no_grad()
-    def evaluate(self, use_mapper=True, truncation_trick=1, only_ema=False):
+    def evaluate(self, use_mapper=True, truncation_trick=1, only_ema=False, no_ema=False):
         self.GAN.eval()
 
         def generate_images(stylizer, generator, latents, noise, labels, truncation_trick=1):
@@ -277,13 +277,13 @@ class Trainer:
                 latents = styles_def_to_tensor(latents)
                 
                 latents_mean = torch.mean(latents, dim=(1,2))
-                latents =  truncation_trick*(latents - latents_mean[:, None, None]) + latents_mean[:, None, None]
+                latents = truncation_trick*(latents - latents_mean[:, None, None]) + latents_mean[:, None, None]
                 
             self.last_latents = latents  # for inspection purpose
 
-            generated_images = self.evaluate_in_chunks(self.batch_size, generator, latents, noise, labels)
-            generated_images.clamp_(0., 1.)
-            return generated_images
+            generated_images_arr = self.evaluate_in_chunks(self.batch_size, generator, latents, noise, labels)
+            generated_images_arr.clamp_(0., 1.)
+            return generated_images_arr
 
         if only_ema:
             average_generated_images = generate_images(self.GAN.SE, self.GAN.GE,
@@ -294,6 +294,9 @@ class Trainer:
         generated_images = generate_images(self.GAN.S, self.GAN.G,
                                            self.latents_to_evaluate, self.noise_to_evaluate, self.labels_to_evaluate,
                                            truncation_trick=truncation_trick)
+        if no_ema:
+            return generated_images
+
         average_generated_images = generate_images(self.GAN.SE, self.GAN.GE,
                                                    self.latents_to_evaluate, self.noise_to_evaluate,
                                                    self.labels_to_evaluate, truncation_trick=truncation_trick)
