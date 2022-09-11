@@ -19,7 +19,7 @@ from config import RESULTS_DIR, MODELS_DIR, EPSILON, LOG_FILENAME, GPU_BATCH_SIZ
     PATH_LENGTH_REGULIZER_FREQUENCY, HOMOGENEOUS_LATENT_SPACE, USE_DIVERSITY_LOSS, SAVE_EVERY, EVALUATE_EVERY, \
     CHANNELS, CONDITION_ON_MAPPER, MIXED_PROBABILITY, GRADIENT_ACCUMULATE_EVERY, MOVING_AVERAGE_START, \
     MOVING_AVERAGE_PERIOD, USE_BIASES, LABEL_EPSILON, LATENT_DIM, NETWORK_CAPACITY, CSV_PATH, \
-    IGNORE_TAGS, TAGS, LIMIT_CLASSES
+    IGNORE_TAGS, TAGS
 
 
 class Trainer:
@@ -36,12 +36,12 @@ class Trainer:
         self.condition_on_mapper = condition_on_mapper
 
         self.dataset = CSVImageDataset(csv_file_path=csv_path, image_size=image_size, root=folder, tags=tags,
-                                       ignore_tags=ignore_tags, limit_classes=LIMIT_CLASSES)
+                                       ignore_tags=ignore_tags, ind=1, no_val=True)
         self.loader = cycle(data.DataLoader(self.dataset, num_workers=0, batch_size=batch_size,
                                             drop_last=True, shuffle=False, pin_memory=False))
         self.folder = folder
         self.label_dim = self.dataset.__label_len__()
-
+        # self.all_posible_labels = self.dataset.__all_posible_labels__()
         if not self.label_dim:
             self.label_dim = 1
 
@@ -84,8 +84,7 @@ class Trainer:
         self.evaluate_in_chunks = evaluate_in_chunks
         self.styles_def_to_tensor = styles_def_to_tensor
 
-        if use_diversity_loss:
-            self.all_posible_labels = torch.load("all_possible_labels.pt").cuda()
+        self.all_posible_labels = torch.load("all_possible_labels.pt").cuda()
 
     def train(self):
         self.GAN.train()
@@ -259,13 +258,20 @@ class Trainer:
 
         if labels_to_evaluate is None:
             if self.labels_to_evaluate is None or reset:
-                self.labels_to_evaluate = np.array([np.eye(self.label_dim)[i % self.label_dim] for i in range(total)])
-        elif isinstance(labels_to_evaluate, int):
-            self.labels_to_evaluate = np.array([np.eye(self.label_dim)[labels_to_evaluate] for _ in range(total)])
+                self.labels_to_evaluate = self.all_posible_labels[np.random.randint(len(self.all_posible_labels), size=(total,))]
         else:
             self.labels_to_evaluate = labels_to_evaluate
         if isinstance(self.labels_to_evaluate, np.ndarray):
             self.labels_to_evaluate = torch.from_numpy(self.labels_to_evaluate).cuda().float()
+        # if labels_to_evaluate is None:
+        #     if self.labels_to_evaluate is None or reset:
+        #         self.labels_to_evaluate = np.array([np.eye(self.label_dim)[i % self.label_dim] for i in range(total)])
+        # elif isinstance(labels_to_evaluate, int):
+        #     self.labels_to_evaluate = np.array([np.eye(self.label_dim)[labels_to_evaluate] for _ in range(total)])
+        # else:
+        #     self.labels_to_evaluate = labels_to_evaluate
+        # if isinstance(self.labels_to_evaluate, np.ndarray):
+        #     self.labels_to_evaluate = torch.from_numpy(self.labels_to_evaluate).cuda().float()
 
     @torch.no_grad()
     def evaluate(self, use_mapper=True, truncation_trick=1, only_ema=False, no_ema=False):
